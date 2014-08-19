@@ -77,7 +77,7 @@ void function(window){
                 NativeCallback.sendToNative('onended', '');
             }
         });
-        
+
         audioDom.addEventListener('pause', function() {
             if (firstPlay) {
                 NativeCallback.sendToNative('onpause', JSON.stringify({
@@ -100,7 +100,7 @@ void function(window){
 
     function getAudioDom() {
         audioDom = document.documentElement.getElementsByTagName('audio')[0];
-        
+
         if (audioDom) {
             window.wandoujia.audio.audioDom = audioDom;
             readyToPlay();
@@ -125,7 +125,7 @@ void function(window){
             for (var i = 0, l = blackList.length; i < l; i ++) {
                 if (location.host.indexOf(blackList[i]) !== -1 && !audioDom.src) {
                     var mayBeEle = document.querySelector('a');
-                    var customEvent = document.createEvent('MouseEvents'); 
+                    var customEvent = document.createEvent('MouseEvents');
                     customEvent.initEvent('click', false, false);
                     mayBeEle.dispatchEvent(customEvent);
                 }
@@ -146,7 +146,7 @@ void function(window){
                         triggerOnReady();
                     }
                 }, 50);
-                
+
             } else {
 
                 if (audioDom.src && !firstPlay ) { //&& !audioDom.paused
@@ -174,7 +174,7 @@ void function(window){
             'xiami.com': 'xiami',
             'qq.com': 'qq',
             'baidu.com': 'baidu',
-            'dongting.com': 'dongting'       
+            'dongting.com': 'dongting'
         };
         for (var k in obj) {
             if (location.host.indexOf(k) !== -1) {
