@@ -16,23 +16,9 @@ module.exports = function (grunt) {
     grunt.initConfig({
         paths: pathConfig,
         watch: {
-            // test: {
-            //     files: ['<%= paths.app %>/javascripts/**/*.js'],
-            //     tasks: ['jshint:test'],
-            //     options: {
-            //         spawn: false
-            //     }
-            // },
             javascripts: {
                 files: ['<%= paths.app %>/javascripts/**/*.js'],
                 tasks: ['build'],
-                options: {
-                    spawn: false
-                }
-            },
-            config: {
-                files: ['<%= paths.dist %>/walkman_web.cf'],
-                tasks: ['shell:adbPush'],
                 options: {
                     spawn: false
                 }
@@ -96,8 +82,8 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('build', [
+        'jshint:test',
         'clean:dist',
-        // 'jshint:test',
         'uglify:dist',
         'copy:template'
     ]);
