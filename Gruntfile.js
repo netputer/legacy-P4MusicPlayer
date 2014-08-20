@@ -16,11 +16,17 @@ module.exports = function (grunt) {
     grunt.initConfig({
         paths: pathConfig,
         watch: {
-            javascripts: {
-                files: ['<%= paths.app %>/javascripts/**/*.js'],
-                tasks: ['build'],
+            build: {
+                files: [
+                    '<%= paths.app %>/javascripts/**/*.js',
+                    '<%= paths.app %>/templates/**/*.cf'
+                ],
+                tasks: [
+                    'build',
+                    'shell:adbPush'
+                ],
                 options: {
-                    spawn: false
+                    spawn: true
                 }
             }
         },
@@ -90,7 +96,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('serve', [
         'build',
-        'shell:adbPush',
         'watch'
     ]);
 
