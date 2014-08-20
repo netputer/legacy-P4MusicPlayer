@@ -154,15 +154,12 @@ void function(window){
 
     // 模拟用户点击
     function simulatedClick() {
-        var blackList = ['163.com'];
-        for (var i = 0, l = blackList.length; i < l; i ++) {
-            if (location.host.indexOf(blackList[i]) !== -1 && !audioDom.src) {
-                var mayBeEle = document.querySelector('a');
-                var customEvent = document.createEvent('MouseEvents');
-                customEvent.initEvent('click', false, false);
-                mayBeEle.dispatchEvent(customEvent);
-                setTimeout(simulatedClick, 50);
-            }
+        if (getSource() === '163') {
+            var mayBeEle = document.querySelector('a');
+            var customEvent = document.createEvent('MouseEvents');
+            customEvent.initEvent('click', false, false);
+            mayBeEle.dispatchEvent(customEvent);
+            setTimeout(simulatedClick, 50);
         }
     }
 
@@ -185,21 +182,19 @@ void function(window){
     }
 
     var hackQQDownload = function() {
-        var QQList = ['qq.com'];
-        for (var i = 0, l = QQList.length; i < l; i ++) {
-            if (location.host.indexOf(QQList[i]) !== -1) {
-                var el = document.getElementById('lrc_js'),
-                elClone = el.cloneNode(true);
-                el.parentNode.replaceChild(elClone, el);
+        var el = document.getElementById('lrc_js'),
+        elClone = el.cloneNode(true);
+        el.parentNode.replaceChild(elClone, el);
 
-                document.getElementById('lrc_js').addEventListener('click', function() {
-                    window.downQQMusic();
-                });
-            }
-        }
+        document.getElementById('lrc_js').addEventListener('click', function() {
+            window.downQQMusic();
+        });
     };
 
-    hackQQDownload();
+    if (getSource() === 'qq') {
+        hackQQDownload();
+    }
+
     getAudioDom();
 
 }(window);
