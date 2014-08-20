@@ -1,0 +1,6 @@
+baidu,baidu.com,百度音乐	163,163.com,网易云音乐	duomi,duomi.com,多米	kugou,kugou.com,酷狗	xiami,xiami.com,虾米	dongting,dongting.com,天天动听	qq,qq.com,QQ音乐
+baidu	163	xiami	dongting
+\.js[^\w]?
+{{JS}}
+(([\w|.]*)\s*?=\s*?new\s*?Audio.*?)[;|,]
+%1$s,%2$s.style.opacity = 0,document.body.appendChild(%3$s)	1,1,2,2
