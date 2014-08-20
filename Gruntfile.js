@@ -1,5 +1,3 @@
-// jshint ignore:start
-
 module.exports = function (grunt) {
     // log task running time
     require('time-grunt')(grunt);

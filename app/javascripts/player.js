@@ -23,7 +23,9 @@ void function(window){
             source = {};
         }
         for (var k in extendObj) {
-            source[k] = extendObj[k];
+            if (extendObj.hasOwnProperty(k)) {
+                source[k] = extendObj[k];
+            }
         }
     }
 
@@ -141,8 +143,7 @@ void function(window){
                 triggerPlay();
                 setTimeout(function() {
                     times += 1;
-                    if (times >= MAX_TIMES) {
-                    } else {
+                    if (times < MAX_TIMES) {
                         triggerOnReady();
                     }
                 }, 50);
@@ -159,7 +160,7 @@ void function(window){
                     }));
                 }
             }
-        }
+        };
         setTimeout(function() {
             triggerOnReady();
         }, 50);
@@ -192,11 +193,11 @@ void function(window){
                 el.parentNode.replaceChild(elClone, el);
 
                 document.getElementById('lrc_js').addEventListener('click', function() {
-                    downQQMusic();
+                    window.downQQMusic();
                 });
             }
         }
-    }
+    };
 
     hackQQDownload();
     getAudioDom();
