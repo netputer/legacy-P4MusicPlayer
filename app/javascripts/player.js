@@ -22,6 +22,27 @@ void function(window){
     var noSentReady = true;
     var gettingDuration = true;
 
+    var HOST_LIST = {
+        'kugou.com': 'kugou',
+        'duomi.com': 'duomi',
+        '163.com': '163',
+        'xiami.com': 'xiami',
+        'qq.com': 'qq',
+        'baidu.com': 'baidu',
+        'dongting.com': 'dongting'
+    };
+
+    // 获取来源信息
+    function getSource() {
+        for (var host in HOST_LIST) {
+            if (location.host.indexOf(host) !== -1) {
+                return HOST_LIST[host];
+            }
+        }
+
+        return false;
+    }
+
     function extend(source, extendObj) {
         if (!source) {
             source = {};
@@ -160,24 +181,6 @@ void function(window){
             customEvent.initEvent('click', false, false);
             mayBeEle.dispatchEvent(customEvent);
             setTimeout(simulatedClick, 50);
-        }
-    }
-
-    // 获取来源信息
-    function getSource() {
-        var obj = {
-            'kugou.com': 'kugou',
-            'duomi.com': 'duomi',
-            '163.com': '163',
-            'xiami.com': 'xiami',
-            'qq.com': 'qq',
-            'baidu.com': 'baidu',
-            'dongting.com': 'dongting'
-        };
-        for (var k in obj) {
-            if (location.host.indexOf(k) !== -1) {
-                return obj[k];
-            }
         }
     }
 
