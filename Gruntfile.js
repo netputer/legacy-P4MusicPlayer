@@ -70,6 +70,30 @@ module.exports = function (grunt) {
                     stderr: true
                 },
                 command: 'adb push <%= paths.dist %>/walkman_web.cf /sdcard/wandoujia/walkman/'
+            },
+            adbForceStop: {
+                options: {
+                    stdout: true,
+                    stderr: true
+                },
+                command: 'adb shell am force-stop com.wandoujia.phoenix2'
+            },
+            adbStart: {
+                options: {
+                    stdout: true,
+                    stderr: true
+                },
+                command: 'adb shell am start -d "wdj://explore/music/album"'
+            },
+            adbRestart: {
+                options: {
+                    stdout: true,
+                    stderr: true
+                },
+                command: [
+                    'adb shell am force-stop com.wandoujia.phoenix2',
+                    'adb shell am start -d "wdj://explore/music/album"'
+                ].join(' && ')
             }
         },
         bump: {
