@@ -1,12 +1,14 @@
 // 闭包，避免影响外层代码
-void function(window){
-    // 声明 webview 方法作用域
+void function (window) {
+    // 供 Native 调用的接口
     window.wandoujia = window.wandoujia || {};
     window.wandoujia.audio = window.wandoujia.audio || {};
-    // 向 Native 发送数据的接口 Object
+
+    // 向 Native 发送数据的接口
+    // 这是 Native 创建的方法，必须直接调用，不能赋值给一个变量
     var NativeCallback = window.NativeCallback || {};
-    // 该处 native 创建的方法必须直接调用，不能赋值给一个变量
     NativeCallback.sendToNative = NativeCallback.sendToNative || function() {};
+
     // 全局的 audio dom 对象
     var audioDom;
     // 尝试 audioDom 是否创建成功
@@ -44,14 +46,15 @@ void function(window){
     }
 
     function extend(source, extendObj) {
-        if (!source) {
-            source = {};
-        }
+        source = source || {};
+
         for (var k in extendObj) {
             if (extendObj.hasOwnProperty(k)) {
                 source[k] = extendObj[k];
             }
         }
+
+        return source;
     }
 
     // 播放相关方法，暴露给 native
