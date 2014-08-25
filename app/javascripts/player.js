@@ -70,9 +70,13 @@ void function (window) {
     extend(wdjAudio, {
         audioDom: audioDom,
         hasAudio: function () {
+            console.log('wdjAudio.hasAudio called', arguments);
+
             return !!audioDom;
         },
         play: function () {
+            console.log('wdjAudio.play called', arguments);
+
             if (!firstPlay) {
                 firstPlay = true;
             }
@@ -80,14 +84,20 @@ void function (window) {
             audioDom.play();
         },
         pause: function () {
+            console.log('wdjAudio.pause called', arguments);
+
             isUserFlag = false;
             audioDom.pause();
         },
         stop: function () {
+            console.log('wdjAudio.stop called', arguments);
+
             audioDom.pause();
             audioDom.currentTime = 1;
         },
         progress: function (time) {
+            console.log('wdjAudio.progress called', arguments);
+
             if (arguments.length) {
                 audioDom.currentTime = Number(time);
             } else {
@@ -97,6 +107,8 @@ void function (window) {
             }
         },
         duration: function () {
+            console.log('wdjAudio.duration called', arguments);
+
             gettingDuration = true;
             var length = 50;
             if (audioDom.currentTime) {
