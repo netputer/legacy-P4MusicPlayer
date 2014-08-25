@@ -40,11 +40,19 @@ module.exports = function (grunt) {
             dist: ['<%= paths.dist %>']
         },
         uglify: {
-            dist: {
+            debug: {
                 files: {
-                    '<%= paths.dist %>/player.min.js': [
-                        '<%= paths.app %>/javascripts/player.js'
-                    ]
+                    '<%= paths.dist %>/player.min.js': ['<%= paths.app %>/javascripts/player.js']
+                }
+            },
+            build: {
+                files: {
+                    '<%= paths.dist %>/player.min.js': ['<%= paths.app %>/javascripts/player.js']
+                },
+                options: {
+                    compress: {
+                       'drop_console': true
+                    }
                 }
             }
         },
@@ -114,12 +122,15 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'jshint:test',
         'clean:dist',
-        'uglify:dist',
+        'uglify:build',
         'copy:template'
     ]);
 
     grunt.registerTask('serve', [
-        'build',
+        'jshint:test',
+        'clean:dist',
+        'uglify:debug',
+        'copy:template',
         'watch'
     ]);
 
