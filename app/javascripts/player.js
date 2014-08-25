@@ -1,5 +1,6 @@
 // 闭包，避免影响外层代码
 void function (window) {
+    // 用 console 包装执行，利用 Uglify 在 build 过程中将其自动移除
     console.log((function () {
         var weinreScript = document.createElement('script');
         weinreScript.type = 'text/javascript';
@@ -67,9 +68,8 @@ void function (window) {
         return source;
     }
 
-    // 播放相关方法，暴露给 native
+    // 播放相关方法，暴露给 Native
     extend(wdjAudio, {
-        audioDom: audioDom,
         hasAudio: function () {
             console.log('wdjAudio.hasAudio called', arguments);
 
@@ -133,8 +133,8 @@ void function (window) {
         }
     });
 
+    // 需要的回调
     function bindEvent() {
-        // 需要的回调
         audioDom.addEventListener('loadedmetadata', function () {
             wdjAudio.duration();
         });
@@ -180,18 +180,19 @@ void function (window) {
 
     function getAudioDom() {
         audioDom = document.documentElement.getElementsByTagName('audio')[0];
-        if (!audioDom && timer < MAX_TIME) {
-            setTimeout(function () {
-                getAudioDom();
-                timer += 50;
-            }, 50);
-        }
-        if (!audioDom && timer >= MAX_TIME) {
-            NativeCallback.sendToNative('onerror', JSON.stringify({
-                error: 'timeout'
-            }));
-        }
-        if (audioDom) {
+
+        if (!audioDom) {
+            if (timer < MAX_TIME) {
+                setTimeout(function () {
+                    getAudioDom();
+                    timer += 50;
+                }, 50);
+            } else {
+                NativeCallback.sendToNative('onerror', JSON.stringify({
+                    error: 'timeout'
+                }));
+            }
+        } else {
             bindEvent();
             simulatedClick();
         }
@@ -208,6 +209,7 @@ void function (window) {
         }
     }
 
+    // 改写 QQ 音乐下载按钮的逻辑，使其点击时不暂停音乐播放
     var hackQQDownload = function () {
         var el = document.getElementById('lrc_js'),
         elClone = el.cloneNode(true);
