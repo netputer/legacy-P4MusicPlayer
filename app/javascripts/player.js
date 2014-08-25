@@ -11,11 +11,12 @@ void function (window) {
     // 供 Native 调用的接口
     window.wandoujia = window.wandoujia || {};
     window.wandoujia.audio = window.wandoujia.audio || {};
+    var wdjAudio = window.wandoujia.audio;
 
     // 向 Native 发送数据的接口
     // 这是 Native 创建的方法，必须直接调用，不能赋值给一个变量
     var NativeCallback = window.NativeCallback || {};
-    NativeCallback.sendToNative = NativeCallback.sendToNative || function() {};
+    NativeCallback.sendToNative = NativeCallback.sendToNative || function () {};
 
     // 全局的 audio dom 对象
     var audioDom;
@@ -66,27 +67,27 @@ void function (window) {
     }
 
     // 播放相关方法，暴露给 native
-    extend(window.wandoujia.audio, {
+    extend(wdjAudio, {
         audioDom: audioDom,
-        hasAudio: function() {
+        hasAudio: function () {
             return !!audioDom;
         },
-        play: function() {
+        play: function () {
             if (!firstPlay) {
                 firstPlay = true;
             }
             isUserFlag = false;
             audioDom.play();
         },
-        pause: function() {
+        pause: function () {
             isUserFlag = false;
             audioDom.pause();
         },
-        stop: function() {
+        stop: function () {
             audioDom.pause();
             audioDom.currentTime = 1;
         },
-        progress: function(time) {
+        progress: function (time) {
             if (arguments.length) {
                 audioDom.currentTime = Number(time);
             } else {
@@ -95,7 +96,7 @@ void function (window) {
                 }));
             }
         },
-        duration: function() {
+        duration: function () {
             gettingDuration = true;
             var length = 50;
             if (audioDom.currentTime) {
@@ -109,37 +110,36 @@ void function (window) {
                     audioDom.currentTime = 1;
                     gettingDuration = false;
                 } else {
-                    window.wandoujia.audio.duration();
+                    wdjAudio.duration();
                 }
             } else {
-                setTimeout(function() {
-                    window.wandoujia.audio.duration();
+                setTimeout(function () {
+                    wdjAudio.duration();
                 }, 100);
             }
         }
     });
 
     function bindEvent() {
-
         // 需要的回调
-        audioDom.addEventListener('loadedmetadata', function() {
-            window.wandoujia.audio.duration();
+        audioDom.addEventListener('loadedmetadata', function () {
+            wdjAudio.duration();
         });
 
-        audioDom.addEventListener('play', function() {
+        audioDom.addEventListener('play', function () {
             NativeCallback.sendToNative('onplay', JSON.stringify({
                 isUser: isUserFlag
             }));
             isUserFlag = true;
         });
 
-        audioDom.addEventListener('ended', function() {
+        audioDom.addEventListener('ended', function () {
             if (firstPlay && !gettingDuration && duration !== 1) {
                 NativeCallback.sendToNative('onended', '');
             }
         });
 
-        audioDom.addEventListener('pause', function() {
+        audioDom.addEventListener('pause', function () {
             if (firstPlay) {
                 NativeCallback.sendToNative('onpause', JSON.stringify({
                     isUser: isUserFlag
@@ -148,11 +148,11 @@ void function (window) {
             }
         });
 
-        audioDom.addEventListener('error', function(data) {
+        audioDom.addEventListener('error', function (data) {
             NativeCallback.sendToNative('onerror', JSON.stringify(data));
         });
 
-        audioDom.addEventListener('durationchange', function() {
+        audioDom.addEventListener('durationchange', function () {
             if (audioDom.duration !== 1 && noSentReady) {
                 noSentReady = false;
                 if (!audioDom.paused) {
@@ -168,7 +168,7 @@ void function (window) {
     function getAudioDom() {
         audioDom = document.documentElement.getElementsByTagName('audio')[0];
         if (!audioDom && timer < MAX_TIME) {
-            setTimeout(function() {
+            setTimeout(function () {
                 getAudioDom();
                 timer += 50;
             }, 50);
@@ -195,12 +195,12 @@ void function (window) {
         }
     }
 
-    var hackQQDownload = function() {
+    var hackQQDownload = function () {
         var el = document.getElementById('lrc_js'),
         elClone = el.cloneNode(true);
         el.parentNode.replaceChild(elClone, el);
 
-        document.getElementById('lrc_js').addEventListener('click', function() {
+        document.getElementById('lrc_js').addEventListener('click', function () {
             window.downQQMusic();
         });
     };
@@ -210,5 +210,4 @@ void function (window) {
     }
 
     getAudioDom();
-
 }(window);
