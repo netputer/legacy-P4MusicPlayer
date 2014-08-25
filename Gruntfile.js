@@ -16,25 +16,17 @@ module.exports = function (grunt) {
     grunt.initConfig({
         paths: pathConfig,
         watch: {
-            // test: {
-            //     files: ['<%= paths.app %>/javascripts/**/*.js'],
-            //     tasks: ['jshint:test'],
-            //     options: {
-            //         spawn: false
-            //     }
-            // },
-            javascripts: {
-                files: ['<%= paths.app %>/javascripts/**/*.js'],
-                tasks: ['build'],
+            build: {
+                files: [
+                    '<%= paths.app %>/javascripts/**/*.js',
+                    '<%= paths.app %>/templates/**/*.cf'
+                ],
+                tasks: [
+                    'build',
+                    'shell:adbPush'
+                ],
                 options: {
-                    spawn: false
-                }
-            },
-            config: {
-                files: ['<%= paths.dist %>/walkman_web.cf'],
-                tasks: ['shell:adbPush'],
-                options: {
-                    spawn: false
+                    spawn: true
                 }
             }
         },
@@ -78,6 +70,30 @@ module.exports = function (grunt) {
                     stderr: true
                 },
                 command: 'adb push <%= paths.dist %>/walkman_web.cf /sdcard/wandoujia/walkman/'
+            },
+            adbForceStop: {
+                options: {
+                    stdout: true,
+                    stderr: true
+                },
+                command: 'adb shell am force-stop com.wandoujia.phoenix2'
+            },
+            adbStart: {
+                options: {
+                    stdout: true,
+                    stderr: true
+                },
+                command: 'adb shell am start -d "wdj://explore/music/album"'
+            },
+            adbRestart: {
+                options: {
+                    stdout: true,
+                    stderr: true
+                },
+                command: [
+                    'adb shell am force-stop com.wandoujia.phoenix2',
+                    'adb shell am start -d "wdj://explore/music/album"'
+                ].join(' && ')
             }
         },
         bump: {
@@ -96,15 +112,14 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('build', [
+        'jshint:test',
         'clean:dist',
-        // 'jshint:test',
         'uglify:dist',
         'copy:template'
     ]);
 
     grunt.registerTask('serve', [
         'build',
-        'shell:adbPush',
         'watch'
     ]);
 
