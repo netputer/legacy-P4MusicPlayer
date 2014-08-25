@@ -22,7 +22,7 @@ module.exports = function (grunt) {
                     '<%= paths.app %>/templates/**/*.cf'
                 ],
                 tasks: [
-                    'build',
+                    'buildWithConsole',
                     'shell:adbPush'
                 ],
                 options: {
@@ -126,11 +126,15 @@ module.exports = function (grunt) {
         'copy:template'
     ]);
 
-    grunt.registerTask('serve', [
+    grunt.registerTask('buildWithConsole', [
         'jshint:test',
         'clean:dist',
         'uglify:debug',
-        'copy:template',
+        'copy:template'
+    ]);
+
+    grunt.registerTask('serve', [
+        'buildWithConsole',
         'watch'
     ]);
 
