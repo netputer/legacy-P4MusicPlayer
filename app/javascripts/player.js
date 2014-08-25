@@ -178,7 +178,7 @@ void function (window) {
 
     // 模拟用户点击
     function simulatedClick() {
-        if (getSource() === '163') {
+        if (getSource() === '163' && !audioDom.src) {
             var mayBeEle = document.querySelector('a');
             var customEvent = document.createEvent('MouseEvents');
             customEvent.initEvent('click', false, false);
