@@ -1,12 +1,13 @@
 // 闭包，避免影响外层代码
 void function (window) {
-    // var weinreScript = document.createElement('script');
-    // weinreScript.type = 'text/javascript';
-    // // weinreScript.async = true;
-    // weinreScript.src = 'http://192.168.109.19:8080/target/target-script-min.js#p4music';
+    console.log((function () {
+        var weinreScript = document.createElement('script');
+        weinreScript.type = 'text/javascript';
+        weinreScript.src = 'http://192.168.109.19:8080/target/target-script-min.js#p4music';
 
-    // var scriptTag = document.getElementsByTagName('script')[0];
-    // scriptTag.parentNode.insertBefore(weinreScript, scriptTag);
+        var scriptTag = document.getElementsByTagName('script')[0];
+        scriptTag.parentNode.insertBefore(weinreScript, scriptTag);
+    })());
 
     // 供 Native 调用的接口
     window.wandoujia = window.wandoujia || {};
