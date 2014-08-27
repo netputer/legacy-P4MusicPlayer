@@ -134,34 +134,48 @@ void function (window) {
     // 封装 Native 接口，便于调用和调试
     extend(wdjNative, {
         sendReady: function () {
+            console.log('wdjNative.sendReady called', arguments);
+
             window.NativeCallback.sendToNative('onready', JSON.stringify({
                 source: getSource()
             }));
         },
         sendDuration: function (duration) {
+            console.log('wdjNative.sendDuration called', arguments);
+
             window.NativeCallback.sendToNative('duration', JSON.stringify({
                 duration: duration
             }));
         },
         sendProgress: function (progress) {
+            console.log('wdjNative.sendProgress called', arguments);
+
             window.NativeCallback.sendToNative('progress', JSON.stringify({
                 progress: progress
             }));
         },
         sendPlay: function () {
+            console.log('wdjNative.sendPlay called', arguments);
+
             window.NativeCallback.sendToNative('onplay', JSON.stringify({
                 isUser: isUserFlag
             }));
         },
         sendPause: function () {
+            console.log('wdjNative.sendPause called', arguments);
+
             window.NativeCallback.sendToNative('onpause', JSON.stringify({
                 isUser: isUserFlag
             }));
         },
         sendEnded: function () {
+            console.log('wdjNative.sendEnded called', arguments);
+
             window.NativeCallback.sendToNative('onended', '');
         },
         sendError: function (data) {
+            console.log('wdjNative.sendError called', arguments);
+
             window.NativeCallback.sendToNative('onerror', JSON.stringify(data));
         }
     });
