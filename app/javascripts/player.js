@@ -98,7 +98,7 @@ void function (window) {
             audioDom.currentTime = 1;
         },
         progress: function (time) {
-            console.log('wdjAudio.progress', arguments);
+            // console.log('wdjAudio.progress', arguments);
 
             if (arguments.length) {
                 audioDom.currentTime = Number(time);
@@ -107,7 +107,7 @@ void function (window) {
             }
         },
         duration: function () {
-            console.log('wdjAudio.duration', arguments);
+            // console.log('wdjAudio.duration', arguments);
 
             gettingDuration = true;
             var length = 50;
@@ -148,7 +148,7 @@ void function (window) {
             }));
         },
         sendProgress: function (progress) {
-            console.log('wdjNative.sendProgress', arguments);
+            // console.log('wdjNative.sendProgress', arguments);
 
             window.NativeCallback.sendToNative('progress', JSON.stringify({
                 progress: progress
