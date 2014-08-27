@@ -33,7 +33,7 @@ void function (window) {
     var isUserFlag = true;
     // 存储 duration
     var duration = 0;
-    var noSentReady = true;
+    var isNativeReadySent = false;
     var gettingDuration = true;
 
     var HOST_LIST = {
@@ -221,8 +221,8 @@ void function (window) {
         audioDom.addEventListener('durationchange', function () {
             console.log('audioDom.onDurationchange', arguments);
 
-            if (audioDom.duration > 1 && noSentReady) {
-                noSentReady = false;
+            if (audioDom.duration > 1 && !isNativeReadySent) {
+                isNativeReadySent = true;
 
                 if (!audioDom.paused) {
                     audioDom.pause();
