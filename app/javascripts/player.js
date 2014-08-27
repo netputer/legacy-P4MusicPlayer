@@ -183,21 +183,29 @@ void function (window) {
     // 需要的回调
     function bindEvent() {
         audioDom.addEventListener('loadedmetadata', function () {
+            console.log('audioDom.onLoadedmetadata called', arguments);
+
             wdjAudio.duration();
         });
 
         audioDom.addEventListener('play', function () {
+            console.log('audioDom.onPlay called', arguments);
+
             wdjNative.sendPlay();
             isUserFlag = true;
         });
 
         audioDom.addEventListener('ended', function () {
+            console.log('audioDom.onEnded called', arguments);
+
             if (firstPlay && !gettingDuration && duration !== 1) {
                 wdjNative.sendEnded();
             }
         });
 
         audioDom.addEventListener('pause', function () {
+            console.log('audioDom.onPause called', arguments);
+
             if (firstPlay) {
                 wdjNative.sendPause();
                 isUserFlag = true;
@@ -205,10 +213,14 @@ void function (window) {
         });
 
         audioDom.addEventListener('error', function (data) {
+            console.log('audioDom.onError called', arguments);
+
             wdjNative.sendError(data);
         });
 
         audioDom.addEventListener('durationchange', function () {
+            console.log('audioDom.onDurationchange called', arguments);
+
             if (audioDom.duration !== 1 && noSentReady) {
                 noSentReady = false;
 
