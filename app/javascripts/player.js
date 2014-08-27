@@ -17,8 +17,9 @@ void function (window) {
 
     // 向 Native 发送数据的接口
     // 这是 Native 创建的方法，必须直接调用，不能赋值给一个变量
-    var NativeCallback = window.NativeCallback || {};
-    NativeCallback.sendToNative = NativeCallback.sendToNative || function () {};
+    window.NativeCallback = window.NativeCallback || {};
+    window.NativeCallback.sendToNative = window.NativeCallback.sendToNative || function () {};
+    var wdjNative = {};
 
     // 全局的 audio dom 对象
     var audioDom;
@@ -102,9 +103,7 @@ void function (window) {
             if (arguments.length) {
                 audioDom.currentTime = Number(time);
             } else {
-                NativeCallback.sendToNative('progress', JSON.stringify({
-                    progress: audioDom.currentTime
-                }));
+                wdjNative.sendProgress(audioDom.currentTime);
             }
         },
         duration: function () {
@@ -117,9 +116,7 @@ void function (window) {
                 audioDom.currentTime += length;
                 if (audioDom.duration > 10 && old > audioDom.currentTime) {
                     duration = Math.max(audioDom.currentTime, audioDom.duration);
-                    NativeCallback.sendToNative('duration', JSON.stringify({
-                        duration: duration
-                    }));
+                    wdjNative.sendDuration(duration);
                     audioDom.currentTime = 1;
                     gettingDuration = false;
                 } else {
@@ -133,6 +130,42 @@ void function (window) {
         }
     });
 
+
+    // 封装 Native 接口，便于调用和调试
+    extend(wdjNative, {
+        sendReady: function () {
+            window.NativeCallback.sendToNative('onready', JSON.stringify({
+                source: getSource()
+            }));
+        },
+        sendDuration: function (duration) {
+            window.NativeCallback.sendToNative('duration', JSON.stringify({
+                duration: duration
+            }));
+        },
+        sendProgress: function (progress) {
+            window.NativeCallback.sendToNative('progress', JSON.stringify({
+                progress: progress
+            }));
+        },
+        sendPlay: function () {
+            window.NativeCallback.sendToNative('onplay', JSON.stringify({
+                isUser: isUserFlag
+            }));
+        },
+        sendPause: function () {
+            window.NativeCallback.sendToNative('onpause', JSON.stringify({
+                isUser: isUserFlag
+            }));
+        },
+        sendEnded: function () {
+            window.NativeCallback.sendToNative('onended', '');
+        },
+        sendError: function (data) {
+            window.NativeCallback.sendToNative('onerror', JSON.stringify(data));
+        }
+    });
+
     // 需要的回调
     function bindEvent() {
         audioDom.addEventListener('loadedmetadata', function () {
@@ -140,40 +173,36 @@ void function (window) {
         });
 
         audioDom.addEventListener('play', function () {
-            NativeCallback.sendToNative('onplay', JSON.stringify({
-                isUser: isUserFlag
-            }));
+            wdjNative.sendPlay();
             isUserFlag = true;
         });
 
         audioDom.addEventListener('ended', function () {
             if (firstPlay && !gettingDuration && duration !== 1) {
-                NativeCallback.sendToNative('onended', '');
+                wdjNative.sendEnded();
             }
         });
 
         audioDom.addEventListener('pause', function () {
             if (firstPlay) {
-                NativeCallback.sendToNative('onpause', JSON.stringify({
-                    isUser: isUserFlag
-                }));
+                wdjNative.sendPause();
                 isUserFlag = true;
             }
         });
 
         audioDom.addEventListener('error', function (data) {
-            NativeCallback.sendToNative('onerror', JSON.stringify(data));
+            wdjNative.sendError(data);
         });
 
         audioDom.addEventListener('durationchange', function () {
             if (audioDom.duration !== 1 && noSentReady) {
                 noSentReady = false;
+
                 if (!audioDom.paused) {
                     audioDom.pause();
                 }
-                NativeCallback.sendToNative('onready', JSON.stringify({
-                    source: getSource()
-                }));
+
+                wdjNative.sendReady();
             }
         });
     }
@@ -188,9 +217,9 @@ void function (window) {
                     timer += 50;
                 }, 50);
             } else {
-                NativeCallback.sendToNative('onerror', JSON.stringify({
+                wdjNative.sendError({
                     error: 'timeout'
-                }));
+                });
             }
         } else {
             bindEvent();
