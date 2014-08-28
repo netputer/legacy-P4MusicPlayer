@@ -265,6 +265,10 @@ void function (window) {
             mayBeEle.dispatchEvent(customEvent);
             setTimeout(simulatedClick, 50);
         }
+
+        if (getSource() === 'xiami') {
+            audioDom.play();
+        }
     }
 
     // 改写 QQ 音乐下载按钮的逻辑，使其点击时不暂停音乐播放
