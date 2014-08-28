@@ -219,6 +219,7 @@ void function (window) {
 
         audioDom.addEventListener('durationchange', function () {
             console.log('audioDom.onDurationchange', arguments);
+            alert('audioDom.duration: ' + audioDom.duration);
 
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
