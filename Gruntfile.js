@@ -51,7 +51,8 @@ module.exports = function (grunt) {
                 },
                 options: {
                     compress: {
-                       'drop_console': true
+                        'drop_console': true,
+                        'pure_funcs': ['alert']
                     }
                 }
             }
