@@ -130,7 +130,6 @@ void function (window) {
         }
     });
 
-
     // 封装 Native 接口，便于调用和调试
     extend(wdjNative, {
         sendReady: function () {
@@ -223,15 +222,7 @@ void function (window) {
 
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
-
-                if (!audioDom.paused) {
-                    audioDom.pause();
-                }
-
-                // 此时 onPause 可能未被触发，而 sendReady 后 Native 会调用 wdjAudio.play ，导致出现刚暂停又播放、刚播放又暂停的死循环
-                setTimeout(function () {
-                    wdjNative.sendReady();
-                }, 200);
+                wdjNative.sendReady();
             }
         });
     }
