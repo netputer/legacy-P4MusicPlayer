@@ -259,7 +259,7 @@ void function (window) {
     // 模拟用户点击
     function simulatedClick() {
         if (getSource() === '163' && !audioDom.src) {
-            var mayBeEle = document.querySelector('a');
+            var mayBeEle = document.querySelector('#detailBox a');
             var customEvent = document.createEvent('MouseEvents');
             customEvent.initEvent('click', false, false);
             mayBeEle.dispatchEvent(customEvent);
