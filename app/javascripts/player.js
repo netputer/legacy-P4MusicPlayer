@@ -4,7 +4,7 @@ void function (window) {
     console.log((function () {
         var weinreScript = document.createElement('script');
         weinreScript.type = 'text/javascript';
-        weinreScript.src = 'http://192.168.109.19:8080/target/target-script-min.js#p4music';
+        weinreScript.src = 'http://weinre.wandoulabs.com/target/target-script-min.js#p4music';
 
         var scriptTag = document.getElementsByTagName('script')[0];
         scriptTag.parentNode.insertBefore(weinreScript, scriptTag);
