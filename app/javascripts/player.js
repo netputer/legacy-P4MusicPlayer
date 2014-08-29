@@ -1,13 +1,25 @@
 // 闭包，避免影响外层代码
 void function (window) {
+    // 用 console 包装执行，利用 Uglify 在 build 过程中将其自动移除
+    console.log((function () {
+        var weinreScript = document.createElement('script');
+        weinreScript.type = 'text/javascript';
+        weinreScript.src = 'http://weinre.wandoulabs.com/target/target-script-min.js#p4music';
+
+        var scriptTag = document.getElementsByTagName('script')[0];
+        scriptTag.parentNode.insertBefore(weinreScript, scriptTag);
+    })());
+
     // 供 Native 调用的接口
     window.wandoujia = window.wandoujia || {};
     window.wandoujia.audio = window.wandoujia.audio || {};
+    var wdjAudio = window.wandoujia.audio;
 
     // 向 Native 发送数据的接口
     // 这是 Native 创建的方法，必须直接调用，不能赋值给一个变量
-    var NativeCallback = window.NativeCallback || {};
-    NativeCallback.sendToNative = NativeCallback.sendToNative || function() {};
+    window.NativeCallback = window.NativeCallback || {};
+    window.NativeCallback.sendToNative = window.NativeCallback.sendToNative || function () {};
+    var wdjNative = {};
 
     // 全局的 audio dom 对象
     var audioDom;
@@ -21,7 +33,7 @@ void function (window) {
     var isUserFlag = true;
     // 存储 duration
     var duration = 0;
-    var noSentReady = true;
+    var isNativeReadySent = false;
     var gettingDuration = true;
 
     var HOST_LIST = {
@@ -57,37 +69,46 @@ void function (window) {
         return source;
     }
 
-    // 播放相关方法，暴露给 native
-    extend(window.wandoujia.audio, {
-        audioDom: audioDom,
-        hasAudio: function() {
+    // 播放相关方法，暴露给 Native
+    extend(wdjAudio, {
+        hasAudio: function () {
+            console.log('wdjAudio.hasAudio', arguments);
+
             return !!audioDom;
         },
-        play: function() {
+        play: function () {
+            console.log('wdjAudio.play', arguments);
+
             if (!firstPlay) {
                 firstPlay = true;
             }
             isUserFlag = false;
             audioDom.play();
         },
-        pause: function() {
+        pause: function () {
+            console.log('wdjAudio.pause', arguments);
+
             isUserFlag = false;
             audioDom.pause();
         },
-        stop: function() {
+        stop: function () {
+            console.log('wdjAudio.stop', arguments);
+
             audioDom.pause();
             audioDom.currentTime = 1;
         },
-        progress: function(time) {
+        progress: function (time) {
+            // console.log('wdjAudio.progress', arguments);
+
             if (arguments.length) {
                 audioDom.currentTime = Number(time);
             } else {
-                NativeCallback.sendToNative('progress', JSON.stringify({
-                    progress: audioDom.currentTime
-                }));
+                wdjNative.sendProgress(audioDom.currentTime);
             }
         },
-        duration: function() {
+        duration: function () {
+            // console.log('wdjAudio.duration', arguments);
+
             gettingDuration = true;
             var length = 50;
             if (audioDom.currentTime) {
@@ -95,82 +116,133 @@ void function (window) {
                 audioDom.currentTime += length;
                 if (audioDom.duration > 10 && old > audioDom.currentTime) {
                     duration = Math.max(audioDom.currentTime, audioDom.duration);
-                    NativeCallback.sendToNative('duration', JSON.stringify({
-                        duration: duration
-                    }));
+                    wdjNative.sendDuration(duration);
                     audioDom.currentTime = 1;
                     gettingDuration = false;
                 } else {
-                    window.wandoujia.audio.duration();
+                    wdjAudio.duration();
                 }
             } else {
-                setTimeout(function() {
-                    window.wandoujia.audio.duration();
+                setTimeout(function () {
+                    wdjAudio.duration();
                 }, 100);
             }
         }
     });
 
-    function bindEvent() {
+    // 封装 Native 接口，便于调用和调试
+    extend(wdjNative, {
+        sendReady: function () {
+            console.log('wdjNative.sendReady', arguments);
 
-        // 需要的回调
-        audioDom.addEventListener('loadedmetadata', function() {
-            window.wandoujia.audio.duration();
-        });
+            window.NativeCallback.sendToNative('onready', JSON.stringify({
+                source: getSource()
+            }));
+        },
+        sendDuration: function (duration) {
+            console.log('wdjNative.sendDuration', arguments);
 
-        audioDom.addEventListener('play', function() {
-            NativeCallback.sendToNative('onplay', JSON.stringify({
+            window.NativeCallback.sendToNative('duration', JSON.stringify({
+                duration: duration
+            }));
+        },
+        sendProgress: function (progress) {
+            // console.log('wdjNative.sendProgress', arguments);
+
+            window.NativeCallback.sendToNative('progress', JSON.stringify({
+                progress: progress
+            }));
+        },
+        sendPlay: function () {
+            console.log('wdjNative.sendPlay', arguments);
+
+            window.NativeCallback.sendToNative('onplay', JSON.stringify({
                 isUser: isUserFlag
             }));
+        },
+        sendPause: function () {
+            console.log('wdjNative.sendPause', arguments);
+
+            window.NativeCallback.sendToNative('onpause', JSON.stringify({
+                isUser: isUserFlag
+            }));
+        },
+        sendEnded: function () {
+            console.log('wdjNative.sendEnded', arguments);
+
+            window.NativeCallback.sendToNative('onended', '');
+        },
+        sendError: function (data) {
+            console.log('wdjNative.sendError', arguments);
+
+            window.NativeCallback.sendToNative('onerror', JSON.stringify(data));
+        }
+    });
+
+    // 需要的回调
+    function bindEvent() {
+        audioDom.addEventListener('loadedmetadata', function () {
+            console.log('audioDom.onLoadedmetadata', arguments);
+
+            wdjAudio.duration();
+        });
+
+        audioDom.addEventListener('play', function () {
+            console.log('audioDom.onPlay', arguments);
+
+            wdjNative.sendPlay();
             isUserFlag = true;
         });
 
-        audioDom.addEventListener('ended', function() {
+        audioDom.addEventListener('ended', function () {
+            console.log('audioDom.onEnded', arguments);
+
             if (firstPlay && !gettingDuration && duration !== 1) {
-                NativeCallback.sendToNative('onended', '');
+                wdjNative.sendEnded();
             }
         });
 
-        audioDom.addEventListener('pause', function() {
+        audioDom.addEventListener('pause', function () {
+            console.log('audioDom.onPause', arguments);
+
             if (firstPlay) {
-                NativeCallback.sendToNative('onpause', JSON.stringify({
-                    isUser: isUserFlag
-                }));
+                wdjNative.sendPause();
                 isUserFlag = true;
             }
         });
 
-        audioDom.addEventListener('error', function(data) {
-            NativeCallback.sendToNative('onerror', JSON.stringify(data));
+        audioDom.addEventListener('error', function (data) {
+            console.log('audioDom.onError', arguments);
+
+            wdjNative.sendError(data);
         });
 
-        audioDom.addEventListener('durationchange', function() {
-            if (audioDom.duration !== 1 && noSentReady) {
-                noSentReady = false;
-                if (!audioDom.paused) {
-                    audioDom.pause();
-                }
-                NativeCallback.sendToNative('onready', JSON.stringify({
-                    source: getSource()
-                }));
+        audioDom.addEventListener('durationchange', function () {
+            console.log('audioDom.onDurationchange', arguments);
+            alert('audioDom.duration: ' + audioDom.duration);
+
+            if (audioDom.duration > 1 && !isNativeReadySent) {
+                isNativeReadySent = true;
+                wdjNative.sendReady();
             }
         });
     }
 
     function getAudioDom() {
         audioDom = document.documentElement.getElementsByTagName('audio')[0];
-        if (!audioDom && timer < MAX_TIME) {
-            setTimeout(function() {
-                getAudioDom();
-                timer += 50;
-            }, 50);
-        }
-        if (!audioDom && timer >= MAX_TIME) {
-            NativeCallback.sendToNative('onerror', JSON.stringify({
-                error: 'timeout'
-            }));
-        }
-        if (audioDom) {
+
+        if (!audioDom) {
+            if (timer < MAX_TIME) {
+                setTimeout(function () {
+                    getAudioDom();
+                    timer += 50;
+                }, 50);
+            } else {
+                wdjNative.sendError({
+                    error: 'timeout'
+                });
+            }
+        } else {
             bindEvent();
             simulatedClick();
         }
@@ -179,20 +251,25 @@ void function (window) {
     // 模拟用户点击
     function simulatedClick() {
         if (getSource() === '163' && !audioDom.src) {
-            var mayBeEle = document.querySelector('a');
+            var mayBeEle = document.querySelector('#detailBox a');
             var customEvent = document.createEvent('MouseEvents');
             customEvent.initEvent('click', false, false);
             mayBeEle.dispatchEvent(customEvent);
             setTimeout(simulatedClick, 50);
         }
+
+        if (getSource() === 'xiami') {
+            audioDom.play();
+        }
     }
 
-    var hackQQDownload = function() {
+    // 改写 QQ 音乐下载按钮的逻辑，使其点击时不暂停音乐播放
+    var hackQQDownload = function () {
         var el = document.getElementById('lrc_js'),
         elClone = el.cloneNode(true);
         el.parentNode.replaceChild(elClone, el);
 
-        document.getElementById('lrc_js').addEventListener('click', function() {
+        document.getElementById('lrc_js').addEventListener('click', function () {
             window.downQQMusic();
         });
     };
@@ -202,5 +279,4 @@ void function (window) {
     }
 
     getAudioDom();
-
 }(window);

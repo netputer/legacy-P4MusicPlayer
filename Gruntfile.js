@@ -22,7 +22,7 @@ module.exports = function (grunt) {
                     '<%= paths.app %>/templates/**/*.cf'
                 ],
                 tasks: [
-                    'build',
+                    'buildWithConsole',
                     'shell:adbPush'
                 ],
                 options: {
@@ -40,11 +40,20 @@ module.exports = function (grunt) {
             dist: ['<%= paths.dist %>']
         },
         uglify: {
-            dist: {
+            debug: {
                 files: {
-                    '<%= paths.dist %>/player.min.js': [
-                        '<%= paths.app %>/javascripts/player.js'
-                    ]
+                    '<%= paths.dist %>/player.min.js': ['<%= paths.app %>/javascripts/player.js']
+                }
+            },
+            build: {
+                files: {
+                    '<%= paths.dist %>/player.min.js': ['<%= paths.app %>/javascripts/player.js']
+                },
+                options: {
+                    compress: {
+                        'drop_console': true,
+                        'pure_funcs': ['alert']
+                    }
                 }
             }
         },
@@ -114,12 +123,19 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'jshint:test',
         'clean:dist',
-        'uglify:dist',
+        'uglify:build',
+        'copy:template'
+    ]);
+
+    grunt.registerTask('buildWithConsole', [
+        'jshint:test',
+        'clean:dist',
+        'uglify:debug',
         'copy:template'
     ]);
 
     grunt.registerTask('serve', [
-        'build',
+        'buildWithConsole',
         'watch'
     ]);
 
