@@ -8,7 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "async": "^0.9.0",
+    "async": "0.9.0",
     "cheerio": "0.17.0",
     "connect-livereload": "0.4.0",
     "grunt": "0.4.5",
@@ -21,6 +21,7 @@
     "grunt-contrib-watch": "0.6.1",
     "grunt-conventional-changelog": "1.1.0",
     "matchdep": "0.3.0",
+    "nodemailer": "1.2.1",
     "request": "2.40.0",
     "time-grunt": "0.3.2"
   },
