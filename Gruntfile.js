@@ -69,6 +69,18 @@ module.exports = function (grunt) {
                         return content.replace('{{JS}}', grunt.file.read(pathConfig.dist + '/player.min.js'));
                     }
                 }
+            },
+            monitor: {
+                files: [{
+                    expand: true,
+                    dest: '<%= paths.dist %>',
+                    src: [
+                        'monitor/**/*',
+                        'node_modules/**/*',
+                        'OathKeeper/**/*',
+                        'package.json'
+                    ]
+                }]
             }
         },
         shell: {
@@ -154,5 +166,14 @@ module.exports = function (grunt) {
         'bump-only:major',
         'changelog',
         'bump-commit'
+    ]);
+
+    grunt.registerTask('build:staging', [
+        'clean:dist',
+        'copy:monitor'
+    ]);
+
+    grunt.registerTask('build:production', [
+        'build:staging'
     ]);
 };
