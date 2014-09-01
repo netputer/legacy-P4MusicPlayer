@@ -18,9 +18,7 @@ var mailOptions = {
 };
 
 var check = function () {
-    console.log();
     console.log('Checking...');
-    console.log();
 
     async.mapSeries(watch.sources, function (source, callback) {
         var parser = url.parse(source.request.url);
@@ -51,8 +49,6 @@ var check = function () {
             }, 200);
         });
     }, function (err, result) {
-        console.log();
-
         var failSources = [];
 
         result.forEach(function (source) {
@@ -63,6 +59,7 @@ var check = function () {
 
         if (failSources.length === 0) {
             console.log('All going well.');
+            console.log();
             return;
         }
 
@@ -77,6 +74,8 @@ var check = function () {
             } else {
                 console.log('Error message sent!');
             }
+
+            console.log();
         });
     });
 };
