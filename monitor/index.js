@@ -17,63 +17,69 @@ var mailOptions = {
     subject: 'Music Sources Report'
 };
 
-console.log('Checking...');
-console.log();
+var check = function () {
+    console.log();
+    console.log('Checking...');
+    console.log();
 
-async.mapSeries(watch.sources, function (source, callback) {
-    var parser = url.parse(source.request.url);
-    var regex = new RegExp(source.regex);
+    async.mapSeries(watch.sources, function (source, callback) {
+        var parser = url.parse(source.request.url);
+        var regex = new RegExp(source.regex);
 
-    request(source.request, function (error, response, body) {
-        if (error || response.statusCode !== 200) {
+        request(source.request, function (error, response, body) {
+            if (error || response.statusCode !== 200) {
+                return;
+            }
+
+            var $ = cheerio.load(body);
+            var targetDOM = $(source.selector);
+            var html = $.html(targetDOM);
+
+            var result = regex.test(html);
+
+            if (result) {
+                console.log('✔ %s', parser.hostname);
+            } else {
+                console.log('✖ %s', parser.hostname);
+            }
+
+            setTimeout(function () {
+                callback(null, {
+                    source: parser.hostname,
+                    status: result
+                });
+            }, 200);
+        });
+    }, function (err, result) {
+        console.log();
+
+        var failSources = [];
+
+        result.forEach(function (source) {
+            if (!source.status) {
+                failSources.push(source.source);
+            }
+        });
+
+        if (failSources.length === 0) {
+            console.log('All going well.');
             return;
         }
 
-        var $ = cheerio.load(body);
-        var targetDOM = $(source.selector);
-        var html = $.html(targetDOM);
+        console.log('Oh no!');
 
-        var result = regex.test(html);
+        mailOptions.to = watch.emails.join(',');
+        mailOptions.text = 'Something wrong! These sources can\'t get correct elements:\n\n' + failSources.join('\n');
 
-        if (result) {
-            console.log('✔ %s', parser.hostname);
-        } else {
-            console.log('✖ %s', parser.hostname);
-        }
-
-        setTimeout(function () {
-            callback(null, {
-                source: parser.hostname,
-                status: result
-            });
-        }, 200);
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log('Message sent fail: ' + error);
+            } else {
+                console.log('Error message sent!');
+            }
+        });
     });
-}, function (err, result) {
-    console.log();
+};
 
-    var failSources = [];
-
-    result.forEach(function (source) {
-        if (!source.status) {
-            failSources.push(source.source);
-        }
-    });
-
-    if (failSources.length === 0) {
-        console.log('All going well.');
-        return;
-    }
-
-    console.log('Oh no!');
-
-    mailOptions.to = watch.emails.join(',');
-    mailOptions.text = 'Something wrong! These sources can\'t get correct elements:\n\n' + failSources.join('\n');
-
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log('Message sent fail: ' + error);
-        } else {
-            console.log('Error message sent!');
-        }
-    });
-});
+setInterval(check, 600000);
+check();
