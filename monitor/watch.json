@@ -8,7 +8,7 @@
                 }
             },
             "selector": "#detailBox a",
-            "regex": "<a href=\"javascript:;\" class=\"cvr z-ply j-play j-flag\"><img class=\"j-flag\" src=\"(.*)\"><span class=\"tag j-flag\">(.*)</span></a>"
+            "regex": "123<a href=\"javascript:;\" class=\"cvr z-ply j-play j-flag\"><img class=\"j-flag\" src=\"(.*)\"><span class=\"tag j-flag\">(.*)</span></a>"
         },
         {
             "request": {
