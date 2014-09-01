@@ -13,7 +13,7 @@ var transporter = nodemailer.createTransport({
 });
 
 var mailOptions = {
-    from: 'Music FE Monitor <noreply@wandoujia.com>',
+    from: 'Music Sources Monitor <noreply@wandoujia.com>',
     subject: 'Music Sources Report'
 };
 
