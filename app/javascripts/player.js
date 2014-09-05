@@ -21,16 +21,11 @@ void function (window) {
     window.NativeCallback.sendToNative = window.NativeCallback.sendToNative || function () {};
     var wdjNative = {};
 
-    // 全局的 audio dom 对象
-    var audioDom;
-    // 尝试 audioDom 是否创建成功
-    var MAX_TIME = 5000;
-    // onready 的计时器
-    var timer = 0;
-    // 是否通过 Native 控制已经播放一次
-    var isNativeControlledPlayOnce = false;
-    // 存储 duration
-    var duration = 0;
+    var audioDom; // 全局的 audio 对象
+    var MAX_TIME = 5000; // 尝试 audioDom 是否创建成功
+    var timer = 0; // onready 的计时器
+    var isNativeControlledPlayOnce = false; // 是否通过 Native 控制已经播放一次
+    var duration = 0; // 存储 duration
     var isNativeReadySent = false;
     var gettingDuration = true;
 
@@ -95,7 +90,7 @@ void function (window) {
         progress: function (time) {
             // console.log('wdjAudio.progress', arguments);
 
-            if (arguments.length) {
+            if (time !== undefined) {
                 audioDom.currentTime = Number(time);
             } else {
                 wdjNative.sendProgress(audioDom.currentTime);
@@ -210,6 +205,7 @@ void function (window) {
 
         audioDom.addEventListener('durationchange', function () {
             console.log('audioDom.onDurationchange', arguments);
+            console.log('audioDom.duration: ' + audioDom.duration);
             alert('audioDom.duration: ' + audioDom.duration);
 
             if (audioDom.duration > 1 && !isNativeReadySent) {
