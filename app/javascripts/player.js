@@ -50,6 +50,30 @@ void function (window) {
         return false;
     }
 
+    // 通过快进的方法获取 duration
+    function getDuration() {
+        var length = 50;
+        gettingDuration = true;
+
+        if (audioDom.currentTime) {
+            var old = audioDom.currentTime + length;
+            audioDom.currentTime += length;
+
+            if (audioDom.duration > 10 && old > audioDom.currentTime) {
+                duration = Math.max(audioDom.currentTime, audioDom.duration);
+                wdjNative.sendDuration(duration);
+                audioDom.currentTime = 1;
+                gettingDuration = false;
+            } else {
+                getDuration();
+            }
+        } else {
+            setTimeout(function () {
+                getDuration();
+            }, 100);
+        }
+    }
+
     function extend(source, extendObj) {
         source = source || {};
 
@@ -94,28 +118,6 @@ void function (window) {
                 audioDom.currentTime = Number(time);
             } else {
                 wdjNative.sendProgress(audioDom.currentTime);
-            }
-        },
-        duration: function () {
-            // console.log('wdjAudio.duration', arguments);
-
-            gettingDuration = true;
-            var length = 50;
-            if (audioDom.currentTime) {
-                var old = audioDom.currentTime + length;
-                audioDom.currentTime += length;
-                if (audioDom.duration > 10 && old > audioDom.currentTime) {
-                    duration = Math.max(audioDom.currentTime, audioDom.duration);
-                    wdjNative.sendDuration(duration);
-                    audioDom.currentTime = 1;
-                    gettingDuration = false;
-                } else {
-                    wdjAudio.duration();
-                }
-            } else {
-                setTimeout(function () {
-                    wdjAudio.duration();
-                }, 100);
             }
         }
     });
@@ -174,7 +176,7 @@ void function (window) {
         audioDom.addEventListener('loadedmetadata', function () {
             console.log('audioDom.onLoadedmetadata', arguments);
 
-            wdjAudio.duration();
+            getDuration();
         });
 
         audioDom.addEventListener('play', function () {
