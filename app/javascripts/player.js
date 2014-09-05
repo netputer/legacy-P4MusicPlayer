@@ -29,8 +29,6 @@ void function (window) {
     var timer = 0;
     // 是否通过 native 控制已经播放一次
     var firstPlay = false;
-    // 标记是否是用户触发
-    var isUserFlag = true;
     // 存储 duration
     var duration = 0;
     var isNativeReadySent = false;
@@ -82,13 +80,12 @@ void function (window) {
             if (!firstPlay) {
                 firstPlay = true;
             }
-            isUserFlag = false;
+
             audioDom.play();
         },
         pause: function () {
             console.log('wdjAudio.pause', arguments);
 
-            isUserFlag = false;
             audioDom.pause();
         },
         stop: function () {
@@ -157,14 +154,14 @@ void function (window) {
             console.log('wdjNative.sendPlay', arguments);
 
             window.NativeCallback.sendToNative('onplay', JSON.stringify({
-                isUser: isUserFlag
+                isUser: true // 历史遗留：没有必要标记此次操作是否由用户触发，下同
             }));
         },
         sendPause: function () {
             console.log('wdjNative.sendPause', arguments);
 
             window.NativeCallback.sendToNative('onpause', JSON.stringify({
-                isUser: isUserFlag
+                isUser: true
             }));
         },
         sendEnded: function () {
@@ -191,7 +188,6 @@ void function (window) {
             console.log('audioDom.onPlay', arguments);
 
             wdjNative.sendPlay();
-            isUserFlag = true;
         });
 
         audioDom.addEventListener('ended', function () {
@@ -207,7 +203,6 @@ void function (window) {
 
             if (firstPlay) {
                 wdjNative.sendPause();
-                isUserFlag = true;
             }
         });
 
