@@ -224,6 +224,7 @@ void function (window) {
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
                 wdjNative.sendReady();
+                wdjNative.sendDuration(audioDom.duration);
             }
         });
     }
