@@ -27,8 +27,8 @@ void function (window) {
     var MAX_TIME = 5000;
     // onready 的计时器
     var timer = 0;
-    // 是否通过 native 控制已经播放一次
-    var firstPlay = false;
+    // 是否通过 Native 控制已经播放一次
+    var isNativeControlledPlayOnce = false;
     // 存储 duration
     var duration = 0;
     var isNativeReadySent = false;
@@ -77,9 +77,7 @@ void function (window) {
         play: function () {
             console.log('wdjAudio.play', arguments);
 
-            if (!firstPlay) {
-                firstPlay = true;
-            }
+            isNativeControlledPlayOnce = true;
 
             audioDom.play();
         },
@@ -193,7 +191,7 @@ void function (window) {
         audioDom.addEventListener('ended', function () {
             console.log('audioDom.onEnded', arguments);
 
-            if (firstPlay && !gettingDuration && duration !== 1) {
+            if (isNativeControlledPlayOnce && !gettingDuration && duration !== 1) {
                 wdjNative.sendEnded();
             }
         });
@@ -201,9 +199,7 @@ void function (window) {
         audioDom.addEventListener('pause', function () {
             console.log('audioDom.onPause', arguments);
 
-            if (firstPlay) {
-                wdjNative.sendPause();
-            }
+            wdjNative.sendPause();
         });
 
         audioDom.addEventListener('error', function (data) {
