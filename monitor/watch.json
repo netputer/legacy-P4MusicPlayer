@@ -28,7 +28,7 @@
                 }
             },
             "selector": "audio",
-            "regex": "<audio id=\"kugou\" autoplay height=\"0\" width=\"0\"></audio>"
+            "regex": "<audio id=\"kugou\" height=\"0\" width=\"0\"></audio>"
         }
     ],
     "emails": [
