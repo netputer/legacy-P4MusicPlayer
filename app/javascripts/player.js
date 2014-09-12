@@ -21,6 +21,10 @@ void function (window) {
     window.NativeCallback.sendToNative = window.NativeCallback.sendToNative || function () {};
     var wdjNative = {};
 
+    // 合作方接口
+    window.xiami = window.xiami || {};
+    window.xiami.audio = window.xiami.audio || {};
+
     var audioDom; // 全局的 audio 对象
     var MAX_TIME = 5000; // 尝试 audioDom 是否创建成功
     var timer = 0; // onready 的计时器
@@ -219,7 +223,13 @@ void function (window) {
     }
 
     function getAudioDom() {
-        audioDom = document.documentElement.getElementsByTagName('audio')[0];
+        switch (getSource()) {
+        case 'xiami':
+            audioDom = window.xiami.audio;
+            break;
+        }
+
+        audioDom = audioDom || document.querySelector('audio');
 
         if (!audioDom) {
             if (timer < MAX_TIME) {
