@@ -21,18 +21,15 @@ void function (window) {
     window.NativeCallback.sendToNative = window.NativeCallback.sendToNative || function () {};
     var wdjNative = {};
 
-    // 全局的 audio dom 对象
-    var audioDom;
-    // 尝试 audioDom 是否创建成功
-    var MAX_TIME = 5000;
-    // onready 的计时器
-    var timer = 0;
-    // 是否通过 native 控制已经播放一次
-    var firstPlay = false;
-    // 标记是否是用户触发
-    var isUserFlag = true;
-    // 存储 duration
-    var duration = 0;
+    // 合作方接口
+    window.xiami = window.xiami || {};
+    window.xiami.audio = window.xiami.audio || {};
+
+    var audioDom; // 全局的 audio 对象
+    var MAX_TIME = 5000; // 尝试 audioDom 是否创建成功
+    var timer = 0; // onready 的计时器
+    var isNativeControlledPlayOnce = false; // 是否通过 Native 控制已经播放一次
+    var duration = 0; // 存储 duration
     var isNativeReadySent = false;
     var gettingDuration = true;
 
@@ -57,6 +54,30 @@ void function (window) {
         return false;
     }
 
+    // 通过快进的方法获取 duration
+    function getDuration() {
+        var length = 50;
+        gettingDuration = true;
+
+        if (audioDom.currentTime) {
+            var old = audioDom.currentTime + length;
+            audioDom.currentTime += length;
+
+            if (audioDom.duration > 10 && old > audioDom.currentTime) {
+                duration = Math.max(audioDom.currentTime, audioDom.duration);
+                wdjNative.sendDuration(duration);
+                audioDom.currentTime = 1;
+                gettingDuration = false;
+            } else {
+                getDuration();
+            }
+        } else {
+            setTimeout(function () {
+                getDuration();
+            }, 100);
+        }
+    }
+
     function extend(source, extendObj) {
         source = source || {};
 
@@ -79,16 +100,13 @@ void function (window) {
         play: function () {
             console.log('wdjAudio.play', arguments);
 
-            if (!firstPlay) {
-                firstPlay = true;
-            }
-            isUserFlag = false;
+            isNativeControlledPlayOnce = true;
+
             audioDom.play();
         },
         pause: function () {
             console.log('wdjAudio.pause', arguments);
 
-            isUserFlag = false;
             audioDom.pause();
         },
         stop: function () {
@@ -100,32 +118,10 @@ void function (window) {
         progress: function (time) {
             // console.log('wdjAudio.progress', arguments);
 
-            if (arguments.length) {
+            if (time !== undefined) {
                 audioDom.currentTime = Number(time);
             } else {
                 wdjNative.sendProgress(audioDom.currentTime);
-            }
-        },
-        duration: function () {
-            // console.log('wdjAudio.duration', arguments);
-
-            gettingDuration = true;
-            var length = 50;
-            if (audioDom.currentTime) {
-                var old = audioDom.currentTime + length;
-                audioDom.currentTime += length;
-                if (audioDom.duration > 10 && old > audioDom.currentTime) {
-                    duration = Math.max(audioDom.currentTime, audioDom.duration);
-                    wdjNative.sendDuration(duration);
-                    audioDom.currentTime = 1;
-                    gettingDuration = false;
-                } else {
-                    wdjAudio.duration();
-                }
-            } else {
-                setTimeout(function () {
-                    wdjAudio.duration();
-                }, 100);
             }
         }
     });
@@ -157,14 +153,14 @@ void function (window) {
             console.log('wdjNative.sendPlay', arguments);
 
             window.NativeCallback.sendToNative('onplay', JSON.stringify({
-                isUser: isUserFlag
+                isUser: true // 历史遗留：没有必要标记此次操作是否由用户触发，下同
             }));
         },
         sendPause: function () {
             console.log('wdjNative.sendPause', arguments);
 
             window.NativeCallback.sendToNative('onpause', JSON.stringify({
-                isUser: isUserFlag
+                isUser: true
             }));
         },
         sendEnded: function () {
@@ -184,20 +180,19 @@ void function (window) {
         audioDom.addEventListener('loadedmetadata', function () {
             console.log('audioDom.onLoadedmetadata', arguments);
 
-            wdjAudio.duration();
+            getDuration();
         });
 
         audioDom.addEventListener('play', function () {
             console.log('audioDom.onPlay', arguments);
 
             wdjNative.sendPlay();
-            isUserFlag = true;
         });
 
         audioDom.addEventListener('ended', function () {
             console.log('audioDom.onEnded', arguments);
 
-            if (firstPlay && !gettingDuration && duration !== 1) {
+            if (isNativeControlledPlayOnce && !gettingDuration && duration !== 1) {
                 wdjNative.sendEnded();
             }
         });
@@ -205,10 +200,7 @@ void function (window) {
         audioDom.addEventListener('pause', function () {
             console.log('audioDom.onPause', arguments);
 
-            if (firstPlay) {
-                wdjNative.sendPause();
-                isUserFlag = true;
-            }
+            wdjNative.sendPause();
         });
 
         audioDom.addEventListener('error', function (data) {
@@ -219,17 +211,25 @@ void function (window) {
 
         audioDom.addEventListener('durationchange', function () {
             console.log('audioDom.onDurationchange', arguments);
+            console.log('audioDom.duration: ' + audioDom.duration);
             alert('audioDom.duration: ' + audioDom.duration);
 
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
                 wdjNative.sendReady();
+                wdjNative.sendDuration(audioDom.duration);
             }
         });
     }
 
     function getAudioDom() {
-        audioDom = document.documentElement.getElementsByTagName('audio')[0];
+        switch (getSource()) {
+        case 'xiami':
+            audioDom = window.xiami.audio;
+            break;
+        }
+
+        audioDom = audioDom || document.querySelector('audio');
 
         if (!audioDom) {
             if (timer < MAX_TIME) {
