@@ -78,6 +78,19 @@ void function (window) {
         }
     }
 
+    var AUDIO_ERROR = [
+        'reserved',
+        'aborted',
+        'network',
+        'decode',
+        'src_not_supported'
+    ];
+
+    // 根据错误码判断错误信息
+    function getErrorMsg(code) {
+        return AUDIO_ERROR[code] || 'unknown';
+    }
+
     function extend(source, extendObj) {
         source = source || {};
 
@@ -168,10 +181,12 @@ void function (window) {
 
             window.NativeCallback.sendToNative('onended', '');
         },
-        sendError: function (data) {
+        sendError: function (msg) {
             console.log('wdjNative.sendError', arguments);
 
-            window.NativeCallback.sendToNative('onerror', JSON.stringify(data));
+            window.NativeCallback.sendToNative('onerror', JSON.stringify({
+                error: msg
+            }));
         }
     });
 
@@ -203,10 +218,10 @@ void function (window) {
             wdjNative.sendPause();
         });
 
-        audioDom.addEventListener('error', function (data) {
+        audioDom.addEventListener('error', function (e) {
             console.log('audioDom.onError', arguments);
 
-            wdjNative.sendError(data);
+            wdjNative.sendError(getErrorMsg(e.currentTarget.error.code));
         });
 
         audioDom.addEventListener('durationchange', function () {
@@ -238,9 +253,7 @@ void function (window) {
                     timer += 50;
                 }, 50);
             } else {
-                wdjNative.sendError({
-                    error: 'timeout'
-                });
+                wdjNative.sendError('timeout');
             }
         } else {
             bindEvent();
