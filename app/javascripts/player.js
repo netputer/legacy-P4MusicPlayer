@@ -247,11 +247,8 @@ void function (window) {
         audioDom = audioDom || document.documentElement.getElementsByTagName('audio')[0];
 
         if (!audioDom) {
-            if (AUDIO_TIMER < MAX_AUDIO_TIME) {
-                setTimeout(function () {
-                    getAudioDom();
-                    AUDIO_TIMER++;
-                }, 200);
+            if (AUDIO_TIMER++ < MAX_AUDIO_TIME) {
+                setTimeout(getAudioDom, 200);
             } else {
                 wdjNative.sendError('timeout');
             }
