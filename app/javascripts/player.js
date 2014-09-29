@@ -251,7 +251,7 @@ void function (window) {
                 setTimeout(function () {
                     getAudioDom();
                     AUDIO_TIMER++;
-                }, 50);
+                }, 200);
             } else {
                 wdjNative.sendError('timeout');
             }
