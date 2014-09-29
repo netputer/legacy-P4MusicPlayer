@@ -244,7 +244,7 @@ void function (window) {
             break;
         }
 
-        audioDom = audioDom || document.querySelector('audio');
+        audioDom = audioDom || document.documentElement.getElementsByTagName('audio')[0];
 
         if (!audioDom) {
             if (timer < MAX_TIME) {
