@@ -55,7 +55,10 @@ void function (window) {
     }
 
     // 通过快进的方法获取 duration
+    // @TODO: 国庆后重构
     function getDuration() {
+        console.log('getDuration', audioDom.currentTime);
+
         var length = 50;
         gettingDuration = true;
 
