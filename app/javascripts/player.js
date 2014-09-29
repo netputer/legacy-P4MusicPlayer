@@ -26,8 +26,8 @@ void function (window) {
     window.xiami.audio = window.xiami.audio || {};
 
     var audioDom; // 全局的 audio 对象
-    var MAX_TIME = 5000; // 尝试 audioDom 是否创建成功
-    var timer = 0; // onready 的计时器
+    var MAX_AUDIO_TIME = 100; // 尝试 audioDom 是否创建成功
+    var AUDIO_TIMER = 0; // 寻找 audio 标签的计数器
     var isNativeControlledPlayOnce = false; // 是否通过 Native 控制已经播放一次
     var duration = 0; // 存储 duration
     var isNativeReadySent = false;
@@ -247,10 +247,10 @@ void function (window) {
         audioDom = audioDom || document.documentElement.getElementsByTagName('audio')[0];
 
         if (!audioDom) {
-            if (timer < MAX_TIME) {
+            if (AUDIO_TIMER < MAX_AUDIO_TIME) {
                 setTimeout(function () {
                     getAudioDom();
-                    timer += 50;
+                    AUDIO_TIMER++;
                 }, 50);
             } else {
                 wdjNative.sendError('timeout');
