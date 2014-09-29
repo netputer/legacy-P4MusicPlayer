@@ -66,7 +66,7 @@ void function (window) {
             if (audioDom.duration > 10 && old > audioDom.currentTime) {
                 duration = Math.max(audioDom.currentTime, audioDom.duration);
                 wdjNative.sendDuration(duration);
-                audioDom.currentTime = 1;
+                audioDom.currentTime = 0;
                 gettingDuration = false;
             } else {
                 getDuration();
@@ -126,7 +126,7 @@ void function (window) {
             console.log('wdjAudio.stop', arguments);
 
             audioDom.pause();
-            audioDom.currentTime = 1;
+            audioDom.currentTime = 0;
         },
         progress: function (time) {
             // console.log('wdjAudio.progress', arguments);
