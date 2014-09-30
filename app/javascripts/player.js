@@ -26,7 +26,7 @@ void function (window) {
     window.xiami.audio = window.xiami.audio || {};
 
     var audioDom; // 全局的 audio 对象
-    var MAX_AUDIO_TIME = 100; // 尝试 audioDom 是否创建成功
+    var MAX_AUDIO_TIME = 25; // 尝试 audioDom 是否创建成功
     var AUDIO_TIMER = 0; // 寻找 audio 标签的计数器
     var isNativeControlledPlayOnce = false; // 是否通过 Native 控制已经播放一次
     var duration = 0; // 存储 duration
