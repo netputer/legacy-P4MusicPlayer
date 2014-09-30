@@ -254,7 +254,13 @@ void function (window) {
             if (AUDIO_TIMER++ < MAX_AUDIO_TIME) {
                 setTimeout(getAudioDom, 200);
             } else {
-                wdjNative.sendError('timeout');
+                var infos = [];
+
+                infos.push('xiamiAudio:' + !!window.xiami.audio);
+                infos.push('querySelector:' + !!document.querySelector('audio'));
+                infos.push('getElementsByTagName:' + !!document.getElementsByTagName('audio')[0]);
+
+                wdjNative.sendError('timeout', infos.join(','));
             }
         } else {
             bindEvent();
