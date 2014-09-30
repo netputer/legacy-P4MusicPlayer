@@ -23,7 +23,6 @@ void function (window) {
 
     // 合作方接口
     window.xiami = window.xiami || {};
-    window.xiami.audio = window.xiami.audio || {};
 
     var audioDom; // 全局的 audio 对象
     var MAX_AUDIO_TIME = 25; // 尝试 audioDom 是否创建成功
