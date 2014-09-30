@@ -184,11 +184,12 @@ void function (window) {
 
             window.NativeCallback.sendToNative('onended', '');
         },
-        sendError: function (msg) {
+        sendError: function (type, params) {
             console.log('wdjNative.sendError', arguments);
 
             window.NativeCallback.sendToNative('onerror', JSON.stringify({
-                error: msg
+                error: type,
+                params: params
             }));
         }
     });
