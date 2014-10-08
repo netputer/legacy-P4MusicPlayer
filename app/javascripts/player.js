@@ -23,11 +23,10 @@ void function (window) {
 
     // 合作方接口
     window.xiami = window.xiami || {};
-    window.xiami.audio = window.xiami.audio || {};
 
     var audioDom; // 全局的 audio 对象
-    var MAX_TIME = 5000; // 尝试 audioDom 是否创建成功
-    var timer = 0; // onready 的计时器
+    var MAX_AUDIO_TIME = 25; // 尝试 audioDom 是否创建成功
+    var AUDIO_TIMER = 0; // 寻找 audio 标签的计数器
     var isNativeControlledPlayOnce = false; // 是否通过 Native 控制已经播放一次
     var duration = 0; // 存储 duration
     var isNativeReadySent = false;
@@ -55,7 +54,10 @@ void function (window) {
     }
 
     // 通过快进的方法获取 duration
+    // @TODO: 国庆后重构
     function getDuration() {
+        console.log('getDuration', audioDom.currentTime);
+
         var length = 50;
         gettingDuration = true;
 
@@ -66,7 +68,7 @@ void function (window) {
             if (audioDom.duration > 10 && old > audioDom.currentTime) {
                 duration = Math.max(audioDom.currentTime, audioDom.duration);
                 wdjNative.sendDuration(duration);
-                audioDom.currentTime = 1;
+                audioDom.currentTime = 0;
                 gettingDuration = false;
             } else {
                 getDuration();
@@ -76,6 +78,19 @@ void function (window) {
                 getDuration();
             }, 100);
         }
+    }
+
+    var AUDIO_ERROR = [
+        'reserved',
+        'aborted',
+        'network',
+        'decode',
+        'src_not_supported'
+    ];
+
+    // 根据错误码判断错误信息
+    function getErrorMsg(code) {
+        return AUDIO_ERROR[code] || 'unknown';
     }
 
     function extend(source, extendObj) {
@@ -92,6 +107,7 @@ void function (window) {
 
     // 播放相关方法，暴露给 Native
     extend(wdjAudio, {
+        dom: audioDom,
         hasAudio: function () {
             console.log('wdjAudio.hasAudio', arguments);
 
@@ -113,7 +129,7 @@ void function (window) {
             console.log('wdjAudio.stop', arguments);
 
             audioDom.pause();
-            audioDom.currentTime = 1;
+            audioDom.currentTime = 0;
         },
         progress: function (time) {
             // console.log('wdjAudio.progress', arguments);
@@ -168,10 +184,13 @@ void function (window) {
 
             window.NativeCallback.sendToNative('onended', '');
         },
-        sendError: function (data) {
+        sendError: function (type, params) {
             console.log('wdjNative.sendError', arguments);
 
-            window.NativeCallback.sendToNative('onerror', JSON.stringify(data));
+            window.NativeCallback.sendToNative('onerror', JSON.stringify({
+                error: type,
+                params: params
+            }));
         }
     });
 
@@ -203,10 +222,10 @@ void function (window) {
             wdjNative.sendPause();
         });
 
-        audioDom.addEventListener('error', function (data) {
+        audioDom.addEventListener('error', function (e) {
             console.log('audioDom.onError', arguments);
 
-            wdjNative.sendError(data);
+            wdjNative.sendError(getErrorMsg(e.currentTarget.error.code));
         });
 
         audioDom.addEventListener('durationchange', function () {
@@ -229,18 +248,19 @@ void function (window) {
             break;
         }
 
-        audioDom = audioDom || document.querySelector('audio');
+        audioDom = audioDom || document.documentElement.getElementsByTagName('audio')[0];
 
         if (!audioDom) {
-            if (timer < MAX_TIME) {
-                setTimeout(function () {
-                    getAudioDom();
-                    timer += 50;
-                }, 50);
+            if (AUDIO_TIMER++ < MAX_AUDIO_TIME) {
+                setTimeout(getAudioDom, 200);
             } else {
-                wdjNative.sendError({
-                    error: 'timeout'
-                });
+                var infos = [];
+
+                infos.push('xiamiAudio:' + !!window.xiami.audio);
+                infos.push('querySelector:' + !!document.querySelector('audio'));
+                infos.push('getElementsByTagName:' + !!document.getElementsByTagName('audio')[0]);
+
+                wdjNative.sendError('timeout', infos.join(','));
             }
         } else {
             bindEvent();
@@ -259,7 +279,13 @@ void function (window) {
         }
 
         if (getSource() === 'xiami') {
-            audioDom.play();
+            setTimeout(function () {
+                alert('audioDom.paused:' + audioDom.paused);
+
+                if (audioDom.paused) {
+                    audioDom.play();
+                }
+            }, 1000);
         }
     }
 
