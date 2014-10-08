@@ -107,6 +107,7 @@ void function (window) {
 
     // 播放相关方法，暴露给 Native
     extend(wdjAudio, {
+        dom: audioDom,
         hasAudio: function () {
             console.log('wdjAudio.hasAudio', arguments);
 
