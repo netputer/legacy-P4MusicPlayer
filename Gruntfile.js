@@ -23,7 +23,7 @@ module.exports = function (grunt) {
                 ],
                 tasks: [
                     'buildWithConsole',
-                    'shell:adbPush'
+                    'adbPush:walkman'
                 ],
                 options: {
                     spawn: true
@@ -72,37 +72,22 @@ module.exports = function (grunt) {
                 }
             }
         },
-        shell: {
-            adbPush: {
-                options: {
-                    stdout: true,
-                    stderr: true
-                },
-                command: 'adb push <%= paths.dist %>/walkman_web.cf /sdcard/wandoujia/walkman/'
-            },
-            adbForceStop: {
-                options: {
-                    stdout: true,
-                    stderr: true
-                },
-                command: 'adb shell am force-stop com.wandoujia.phoenix2'
-            },
-            adbStart: {
-                options: {
-                    stdout: true,
-                    stderr: true
-                },
-                command: 'adb shell am start -d "wdj://explore/music/album"'
-            },
-            adbRestart: {
-                options: {
-                    stdout: true,
-                    stderr: true
-                },
-                command: [
-                    'adb shell am force-stop com.wandoujia.phoenix2',
-                    'adb shell am start -d "wdj://explore/music/album"'
-                ].join(' && ')
+        adbPush: {
+            walkman: {
+                files: [{
+                    src: '<%= paths.dist %>/walkman_web.cf',
+                    dest: '/sdcard/wandoujia/walkman'
+                }]
+            }
+        },
+        adbForceStop: {
+            wdj: {
+                packageNames: ['com.wandoujia.phoenix2']
+            }
+        },
+        adbStart: {
+            music: {
+                intents: ['"wdj://explore/music/album"']
             }
         },
         bump: {
