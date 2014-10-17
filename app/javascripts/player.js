@@ -255,7 +255,10 @@ void function (window) {
                 setTimeout(getAudioDom, 200);
             } else {
                 var infos = [];
+                var bodyElement = document.getElementsByTagName('body')[0] || {};
 
+                infos.push('title:' + document.title);
+                infos.push('bodyChildElementCount:' + bodyElement.childElementCount);
                 infos.push('xiamiAudio:' + !!window.xiami.audio);
                 infos.push('querySelector:' + !!document.querySelector('audio'));
                 infos.push('getElementsByTagName:' + !!document.getElementsByTagName('audio')[0]);
