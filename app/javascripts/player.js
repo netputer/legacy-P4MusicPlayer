@@ -139,6 +139,9 @@ void function (window) {
             } else {
                 wdjNative.sendProgress(audioDom.currentTime);
             }
+        },
+        buffer: function () {
+            wdjNative.sendBuffer();
         }
     });
 
@@ -164,6 +167,21 @@ void function (window) {
             window.NativeCallback.sendToNative('progress', JSON.stringify({
                 progress: progress
             }));
+        },
+        sendBuffer: function () {
+            // console.log('wdjNative.sendBuffer', arguments);
+
+            var buffered = audioDom.buffered;
+            var bufferArray = [];
+            var i;
+
+            for (i = 0; i < buffered.length; i++) {
+                bufferArray.push([buffered.start(i), buffered.end(i)]);
+            }
+
+            console.log('buffer', JSON.stringify(bufferArray));
+
+            window.NativeCallback.sendToNative('buffer', JSON.stringify(bufferArray));
         },
         sendPlay: function () {
             console.log('wdjNative.sendPlay', arguments);
@@ -211,6 +229,11 @@ void function (window) {
         audioDom.addEventListener('ended', function () {
             console.log('audioDom.onEnded', arguments);
 
+            console.log('isNativeControlledPlayOnce', isNativeControlledPlayOnce);
+            console.log('gettingDuration', gettingDuration);
+            console.log('duration', duration);
+            console.log('audioDom.duration', audioDom.duration);
+
             if (isNativeControlledPlayOnce && !gettingDuration && duration !== 1) {
                 wdjNative.sendEnded();
             }
@@ -235,6 +258,8 @@ void function (window) {
 
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
+                gettingDuration = false;
+
                 wdjNative.sendReady();
                 wdjNative.sendDuration(audioDom.duration);
             }
@@ -255,7 +280,10 @@ void function (window) {
                 setTimeout(getAudioDom, 200);
             } else {
                 var infos = [];
+                var bodyElement = document.getElementsByTagName('body')[0] || {};
 
+                infos.push('title:' + document.title);
+                infos.push('bodyChildElementCount:' + bodyElement.childElementCount);
                 infos.push('xiamiAudio:' + !!window.xiami.audio);
                 infos.push('querySelector:' + !!document.querySelector('audio'));
                 infos.push('getElementsByTagName:' + !!document.getElementsByTagName('audio')[0]);
