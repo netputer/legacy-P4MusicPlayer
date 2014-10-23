@@ -229,6 +229,11 @@ void function (window) {
         audioDom.addEventListener('ended', function () {
             console.log('audioDom.onEnded', arguments);
 
+            console.log('isNativeControlledPlayOnce', isNativeControlledPlayOnce);
+            console.log('gettingDuration', gettingDuration);
+            console.log('duration', duration);
+            console.log('audioDom.duration', audioDom.duration);
+
             if (isNativeControlledPlayOnce && !gettingDuration && duration !== 1) {
                 wdjNative.sendEnded();
             }
@@ -253,6 +258,8 @@ void function (window) {
 
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
+                gettingDuration = false;
+
                 wdjNative.sendReady();
                 wdjNative.sendDuration(audioDom.duration);
             }
