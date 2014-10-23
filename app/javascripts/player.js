@@ -139,6 +139,9 @@ void function (window) {
             } else {
                 wdjNative.sendProgress(audioDom.currentTime);
             }
+        },
+        buffer: function () {
+            wdjNative.sendBuffer();
         }
     });
 
@@ -164,6 +167,21 @@ void function (window) {
             window.NativeCallback.sendToNative('progress', JSON.stringify({
                 progress: progress
             }));
+        },
+        sendBuffer: function () {
+            // console.log('wdjNative.sendBuffer', arguments);
+
+            var buffered = audioDom.buffered;
+            var bufferArray = [];
+            var i;
+
+            for (i = 0; i < buffered.length; i++) {
+                bufferArray.push([buffered.start(i), buffered.end(i)]);
+            }
+
+            console.log('buffer', JSON.stringify(bufferArray));
+
+            window.NativeCallback.sendToNative('buffer', JSON.stringify(bufferArray));
         },
         sendPlay: function () {
             console.log('wdjNative.sendPlay', arguments);
