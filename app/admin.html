@@ -11,6 +11,9 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">Walkman &middot; Online Config</a>
             </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="?env=production">切换至线上环境</a></li>
+            </ul>
         </div>
     </div>
     <div class="container">
@@ -18,18 +21,41 @@
             <textarea class="form-control" rows="15"></textarea>
         </div>
         <div class="form-group text-center">
-            <button type="button" class="btn btn-primary btn-lg btn-block">更新</button>
+            <button type="button" class="btn btn-primary btn-lg btn-block" disabled>更新</button>
         </div>
     </div>
 
     <script type="text/javascript" src="http://static.wdjimg.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript">
+        var IS_PRODUCTION = false;
         var $textarea = $('textarea');
         var $button = $('button');
 
+        function getAPIRoot() {
+            if (IS_PRODUCTION) {
+                return 'http://10.0.22.121:8082';
+            }
+
+            return 'http://10.0.70.30:8080';
+        }
+
+        function getEnvironmentName() {
+            return IS_PRODUCTION ? '线上' : '测试';
+        }
+
+        function updateEnvironment() {
+            $button.text('更新' + getEnvironmentName() + '环境').prop('disabled', false);
+        }
+
+        if (location.search.indexOf('env=production') > -1) {
+            IS_PRODUCTION = true;
+        }
+
+        updateEnvironment();
+
         $.ajax({
             type: 'GET',
-            url: 'http://10.0.22.121:8082/api/v1/h5Control?version=0',
+            url: getAPIRoot() + '/api/v1/h5Control?version=0',
             dataType: 'json'
         }).success(function (data) {
             $textarea.val(data.hack);
@@ -38,7 +64,7 @@
         $button.on('click', function () {
             $.ajax({
                 type: 'POST',
-                url: 'http://10.0.22.121:8082/api/admin/music/h5Hack/update',
+                url: getAPIRoot() + '/api/admin/music/h5Hack/update',
                 data: {
                     'id': 1,
                     'hack': $('textarea').val()
@@ -46,9 +72,9 @@
                 dataType: 'text'
             }).success(function (data) {
                 if (data === '1') {
-                    alert('更新成功！');
+                    alert('更新' + getEnvironmentName() + '环境成功！');
                 } else {
-                    alert('更新失败！');
+                    alert('更新' + getEnvironmentName() + '环境失败！');
                 }
             });
         });
