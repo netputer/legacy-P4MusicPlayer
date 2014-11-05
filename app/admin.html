@@ -31,7 +31,7 @@
         var $textarea = $('textarea');
         var $button = $('button');
 
-        function getAPIRoot() {
+        function getAccessPoint() {
             if (IS_PRODUCTION) {
                 return 'http://10.0.22.121:8082';
             }
@@ -55,7 +55,7 @@
 
         $.ajax({
             type: 'GET',
-            url: getAPIRoot() + '/api/v1/h5Control?version=0',
+            url: getAccessPoint() + '/api/v1/h5Control?version=0',
             dataType: 'json'
         }).success(function (data) {
             $textarea.val(data.hack);
@@ -64,7 +64,7 @@
         $button.on('click', function () {
             $.ajax({
                 type: 'POST',
-                url: getAPIRoot() + '/api/admin/music/h5Hack/update',
+                url: getAccessPoint() + '/api/admin/music/h5Hack/update',
                 data: {
                     'id': 1,
                     'hack': $('textarea').val()
