@@ -307,13 +307,7 @@ void function (window) {
         }
 
         if (getSource() === 'xiami') {
-            setTimeout(function () {
-                alert('audioDom.paused:' + audioDom.paused);
-
-                if (audioDom.paused) {
-                    audioDom.play();
-                }
-            }, 1000);
+            audioDom.autoplay = true;
         }
     }
 
