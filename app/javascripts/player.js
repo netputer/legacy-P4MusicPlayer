@@ -28,9 +28,7 @@ void function (window) {
     var MAX_AUDIO_TIME = 25; // 尝试 audioDom 是否创建成功
     var AUDIO_TIMER = 0; // 寻找 audio 标签的计数器
     var isNativeControlledPlayOnce = false; // 是否通过 Native 控制已经播放一次
-    var duration = 0; // 存储 duration
     var isNativeReadySent = false;
-    var gettingDuration = true;
 
     var HOST_LIST = {
         'kugou.com': 'kugou',
@@ -51,33 +49,6 @@ void function (window) {
         }
 
         return false;
-    }
-
-    // 通过快进的方法获取 duration
-    // @TODO: 国庆后重构
-    function getDuration() {
-        console.log('getDuration', audioDom.currentTime);
-
-        var length = 50;
-        gettingDuration = true;
-
-        if (audioDom.currentTime) {
-            var old = audioDom.currentTime + length;
-            audioDom.currentTime += length;
-
-            if (audioDom.duration > 10 && old > audioDom.currentTime) {
-                duration = Math.max(audioDom.currentTime, audioDom.duration);
-                wdjNative.sendDuration(duration);
-                audioDom.currentTime = 0;
-                gettingDuration = false;
-            } else {
-                getDuration();
-            }
-        } else {
-            setTimeout(function () {
-                getDuration();
-            }, 100);
-        }
     }
 
     var AUDIO_ERROR = [
@@ -221,12 +192,6 @@ void function (window) {
 
     // 需要的回调
     function bindEvent() {
-        audioDom.addEventListener('loadedmetadata', function () {
-            console.log('audioDom.onLoadedmetadata', arguments);
-
-            getDuration();
-        });
-
         audioDom.addEventListener('play', function () {
             console.log('audioDom.onPlay', arguments);
 
@@ -237,11 +202,9 @@ void function (window) {
             console.log('audioDom.onEnded', arguments);
 
             console.log('isNativeControlledPlayOnce', isNativeControlledPlayOnce);
-            console.log('gettingDuration', gettingDuration);
-            console.log('duration', duration);
             console.log('audioDom.duration', audioDom.duration);
 
-            if (isNativeControlledPlayOnce && !gettingDuration && duration !== 1) {
+            if (isNativeControlledPlayOnce && audioDom.duration !== 1) {
                 wdjNative.sendEnded();
             }
         });
@@ -265,7 +228,6 @@ void function (window) {
 
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
-                gettingDuration = false;
 
                 wdjNative.sendReady();
                 wdjNative.sendDuration(audioDom.duration);
