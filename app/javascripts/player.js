@@ -188,8 +188,6 @@ void function (window) {
                 bufferArray.push([buffered.start(i), buffered.end(i)]);
             }
 
-            console.log('buffer', JSON.stringify(bufferArray));
-
             window.NativeCallback.sendToNative('buffer', JSON.stringify(bufferArray));
         },
         sendPlay: function () {
