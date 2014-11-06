@@ -315,6 +315,10 @@ void function (window) {
 
         if (getSource() === 'xiami') {
             audioDom.autoplay = true;
+
+            if (!!audioDom.src) {
+                audioDom.src = audioDom.src;
+            }
         }
     }
 
