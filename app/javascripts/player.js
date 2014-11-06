@@ -142,6 +142,15 @@ void function (window) {
         },
         buffer: function () {
             wdjNative.sendBuffer();
+        },
+        xiamiSrc: function (newSrc) {
+            var xiami = window.xiami.audio;
+
+            if (!!newSrc) {
+                xiami.src = newSrc;
+            } else {
+                window.NativeCallback.sendToNative('src', JSON.stringify(xiami.src));
+            }
         }
     });
 
