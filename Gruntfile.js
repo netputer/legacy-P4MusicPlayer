@@ -76,7 +76,7 @@ module.exports = function (grunt) {
             walkman: {
                 files: [{
                     src: '<%= paths.dist %>/walkman_web.cf',
-                    dest: '/sdcard/wandoujia/walkman'
+                    dest: '/sdcard/wandoujia/walkman/walkman_web.cf'
                 }]
             }
         },
