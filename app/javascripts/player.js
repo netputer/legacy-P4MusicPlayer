@@ -226,11 +226,11 @@ void function (window) {
             console.log('audioDom.duration: ' + audioDom.duration);
             alert('audioDom.duration: ' + audioDom.duration);
 
+            wdjNative.sendDuration(audioDom.duration);
+
             if (audioDom.duration > 1 && !isNativeReadySent) {
                 isNativeReadySent = true;
-
                 wdjNative.sendReady();
-                wdjNative.sendDuration(audioDom.duration);
             }
         });
     }
@@ -279,6 +279,7 @@ void function (window) {
             audioDom.autoplay = true;
 
             if (!!audioDom.src) {
+                alert('reset src');
                 audioDom.src = audioDom.src;
             }
         }
