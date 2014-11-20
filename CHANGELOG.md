@@ -1,3 +1,18 @@
+<a name="0.3.19"></a>
+### 0.3.19 (2014-11-20)
+
+
+#### Bug Fixes
+
+* Send duration everytime when duration changed ((b6c6be8a))
+* No auto play when src already set ((b1e1be18))
+
+
+#### Features
+
+* No more fast forward to get duration ((b868fef7))
+
+
 <a name="0.3.18"></a>
 ### 0.3.18 (2014-11-06)
 
