@@ -285,20 +285,5 @@ void function (window) {
         }
     }
 
-    // 改写 QQ 音乐下载按钮的逻辑，使其点击时不暂停音乐播放
-    var hackQQDownload = function () {
-        var el = document.getElementById('lrc_js'),
-        elClone = el.cloneNode(true);
-        el.parentNode.replaceChild(elClone, el);
-
-        document.getElementById('lrc_js').addEventListener('click', function () {
-            window.downQQMusic();
-        });
-    };
-
-    if (getSource() === 'qq') {
-        hackQQDownload();
-    }
-
     getAudioDom();
 }(window);
