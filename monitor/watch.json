@@ -12,13 +12,13 @@
         },
         {
             "request": {
-                "url": "http://y.qq.com/i/song.html?songid=1291044#webchat_redirect",
+                "url": "http://data.music.qq.com/playsong.html?songmid=001dGpAD2yLgnc",
                 "headers": {
                     "User-Agent": "Mozilla/5.0 (Linux; Android 4.4.4; Nexus 5 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Mobile Safari/537.36"
                 }
             },
             "selector": "audio",
-            "regex": "<audio id=\"h5audio_media\" autoplay height=\"0\" width=\"0\"></audio>"
+            "regex": "<audio id=\"h5audio_media\" autoplay(.*)></audio>"
         },
         {
             "request": {
