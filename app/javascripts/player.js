@@ -114,14 +114,8 @@ void function (window) {
         buffer: function () {
             wdjNative.sendBuffer();
         },
-        xiamiSrc: function (newSrc) {
-            var xiami = window.xiami.audio;
-
-            if (!!newSrc) {
-                xiami.src = newSrc;
-            } else {
-                window.NativeCallback.sendToNative('src', JSON.stringify(xiami.src));
-            }
+        querySrc: function () {
+            wdjNative.sendSource(audioDom.src);
         }
     });
 
@@ -186,6 +180,13 @@ void function (window) {
             window.NativeCallback.sendToNative('onerror', JSON.stringify({
                 error: type,
                 params: params
+            }));
+        },
+        sendSource: function (src) {
+            console.log('wdjNative.sendSource', arguments);
+
+            window.NativeCallback.sendToNative('onfetchsrc', JSON.stringify({
+                src: src
             }));
         }
     });
