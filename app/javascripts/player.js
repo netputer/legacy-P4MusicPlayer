@@ -19,6 +19,9 @@ void function (window) {
     // 这是 Native 创建的方法，必须直接调用，不能赋值给一个变量
     window.NativeCallback = window.NativeCallback || {};
     window.NativeCallback.sendToNative = window.NativeCallback.sendToNative || function () {};
+    window.NativeCallback.isFakePlay = window.NativeCallback.isFakePlay || function () {
+        return false;
+    };
     var wdjNative = {};
 
     // 合作方接口
@@ -191,6 +194,15 @@ void function (window) {
         }
     });
 
+    // 注入 audio 标签
+    function injectAudio(audio) {
+        if (window.NativeCallback.isFakePlay()) {
+            audio.muted = true;
+            audio._play = audio.play;
+            audio.play = function () {};
+        }
+    }
+
     // 需要的回调
     function bindEvent() {
         audioDom.addEventListener('play', function () {
@@ -261,6 +273,7 @@ void function (window) {
                 wdjNative.sendError('timeout', infos.join(','));
             }
         } else {
+            injectAudio(audioDom);
             bindEvent();
             simulatedClick();
         }
