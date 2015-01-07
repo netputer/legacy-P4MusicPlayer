@@ -1,3 +1,13 @@
+<a name="0.3.21"></a>
+### 0.3.21 (2015-01-07)
+
+
+#### Features
+
+* Inject audio element ((e9416449))
+* Query audio source ((eba5a709))
+
+
 <a name="0.3.20"></a>
 ### 0.3.20 (2014-11-28)
 
