@@ -19,6 +19,9 @@ void function (window) {
     // 这是 Native 创建的方法，必须直接调用，不能赋值给一个变量
     window.NativeCallback = window.NativeCallback || {};
     window.NativeCallback.sendToNative = window.NativeCallback.sendToNative || function () {};
+    window.NativeCallback.isFakePlay = window.NativeCallback.isFakePlay || function () {
+        return false;
+    };
     var wdjNative = {};
 
     // 合作方接口
@@ -114,14 +117,8 @@ void function (window) {
         buffer: function () {
             wdjNative.sendBuffer();
         },
-        xiamiSrc: function (newSrc) {
-            var xiami = window.xiami.audio;
-
-            if (!!newSrc) {
-                xiami.src = newSrc;
-            } else {
-                window.NativeCallback.sendToNative('src', JSON.stringify(xiami.src));
-            }
+        querySrc: function () {
+            wdjNative.sendSource(audioDom.src);
         }
     });
 
@@ -187,8 +184,24 @@ void function (window) {
                 error: type,
                 params: params
             }));
+        },
+        sendSource: function (src) {
+            console.log('wdjNative.sendSource', arguments);
+
+            window.NativeCallback.sendToNative('onfetchsrc', JSON.stringify({
+                src: src
+            }));
         }
     });
+
+    // 注入 audio 标签
+    function injectAudio(audio) {
+        if (window.NativeCallback.isFakePlay()) {
+            audio.muted = true;
+            audio._play = audio.play;
+            audio.play = function () {};
+        }
+    }
 
     // 需要的回调
     function bindEvent() {
@@ -260,6 +273,7 @@ void function (window) {
                 wdjNative.sendError('timeout', infos.join(','));
             }
         } else {
+            injectAudio(audioDom);
             bindEvent();
             simulatedClick();
         }
