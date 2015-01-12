@@ -194,13 +194,9 @@ void function (window) {
         }
     });
 
-    // 注入 audio 标签
-    function injectAudio(audio) {
-        if (window.NativeCallback.isFakePlay()) {
-            audio.muted = true;
-            audio._play = audio.play;
-            audio.play = function () {};
-        }
+    // 使 audio 播放静音
+    function muteAudioPlay(audio) {
+        audio.muted = true;
     }
 
     // 需要的回调
@@ -273,7 +269,10 @@ void function (window) {
                 wdjNative.sendError('timeout', infos.join(','));
             }
         } else {
-            injectAudio(audioDom);
+            if (window.NativeCallback.isFakePlay()) {
+                muteAudioPlay(audioDom);
+            }
+
             bindEvent();
             simulatedClick();
         }
