@@ -273,6 +273,8 @@ void function (window) {
                 muteAudioPlay(audioDom);
             }
 
+            audioDom.loop = false;
+
             bindEvent();
             simulatedClick();
         }
